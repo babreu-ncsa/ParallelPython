@@ -5,7 +5,7 @@
 # National Center for Supercomputing Applications (NCSA)
 #  
 # Creation Date: Tuesday, 14th June 2022, 8:17:38 am
-# Last Modified: Tuesday, 14th June 2022, 8:49:16 am
+# Last Modified: Tuesday, 14th June 2022, 12:54:54 pm
 #  
 # Copyright (c) 2022, Bruno R. de Abreu, National Center for Supercomputing Applications.
 # All rights reserved.
@@ -22,7 +22,9 @@
 #          author or copyright holders be liable for any kind of claim in connection to
 #          the software and its usage.
 ###
-from ..MapReduce import MapReduce
+import sys
+sys.path.insert(0, '../')
+from MapReduce import MapReduce
 
 def generate_random_text(seed):
     """
