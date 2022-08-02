@@ -5,7 +5,7 @@
 # National Center for Supercomputing Applications (NCSA)
 #  
 # Creation Date: Tuesday, 14th June 2022, 8:17:38 am
-# Last Modified: Tuesday, 2nd August 2022, 1:20:27 pm
+# Last Modified: Tuesday, 2nd August 2022, 1:29:12 pm
 #  
 # Copyright (c) 2022, Bruno R. de Abreu, National Center for Supercomputing Applications.
 # All rights reserved.
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     counts = dict(Counter(chain(*totalText)))
     counts = sorted(counts.items(), key=operator.itemgetter(1), reverse=True)
     for word, count in counts:
-        print(f"{word}: {count} ({count / (nwords*len(seeds))} %)")
+        print(f"{word}: {count} ({100*count / (nwords*len(seeds))} %)")
     stop = time.perf_counter()
     print(f"Execution time (s): {stop-start}\n\n")
 
@@ -97,6 +97,6 @@ if __name__ == "__main__":
     word_counts = mapper(mapArguments)
     word_counts = sorted(word_counts, key=operator.itemgetter(1), reverse=True)
     for word, count in word_counts:
-        print(f"{word}: {count} ({count / (nwords*len(seeds))} %)")
+        print(f"{word}: {count} ({100*count / (nwords*len(seeds))} %)")
     stop = time.perf_counter()
     print(f"Execution time (s): {stop-start}")
