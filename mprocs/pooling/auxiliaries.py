@@ -1,11 +1,11 @@
 ###
-# File: pooling.py
-# Description: Simple example of data parallelism using multiprocessing. 
+# File: auxiliaries.py
+# Description: Auxiliary functions for pooling.py
 # Author: Bruno R. de Abreu  |  babreu at illinois dot edu
 # National Center for Supercomputing Applications (NCSA)
 #  
-# Creation Date: Wednesday, 15th June 2022, 9:33:18 am
-# Last Modified: Tuesday, 2nd August 2022, 10:48:59 am
+# Creation Date: Tuesday, 2nd August 2022, 10:46:01 am
+# Last Modified: Tuesday, 2nd August 2022, 10:46:30 am
 #  
 # Copyright (c) 2022, Bruno R. de Abreu, National Center for Supercomputing Applications.
 # All rights reserved.
@@ -23,30 +23,17 @@
 #          the software and its usage.
 ###
 
-import multiprocessing as mp
-import time
-import auxiliaries as aux
+def calculate_pi(seed, nTrials=10000):
+    """
+    Calculate the value of pi using the Monte Carlo method.
+    """
+    import random
+    random.seed(seed)
+    inside = 0
+    for i in range(nTrials):
+        x = random.random()
+        y = random.random()
+        if (x**2 + y**2 <= 1):
+            inside += 1
 
-if __name__ == "__main__":
-    seeds = [1, 2, 3, 4]
-    nTrials = 10000000
-
-    # Serial version
-    results_serial = []
-    start = time.perf_counter()
-    for seed in seeds:
-        results_serial.append(aux.calculate_pi(seed, nTrials))
-    end = time.perf_counter()
-    print("Serial version:")
-    print(results_serial)
-    print(f"in {end - start} seconds")
-
-    # Parallel version
-    print("\nParallel version:")
-    pool = mp.Pool(processes=4)
-    start = time.perf_counter()
-    results_parallel = pool.starmap(aux.calculate_pi, zip(seeds, 4*[nTrials]))
-    end = time.perf_counter()
-    print(results_parallel)
-    print(f"in {end - start} seconds")
-
+    return 4.0 * inside / nTrials
