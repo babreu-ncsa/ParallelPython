@@ -5,7 +5,7 @@
 # National Center for Supercomputing Applications (NCSA)
 #  
 # Creation Date: Tuesday, 14th June 2022, 8:17:38 am
-# Last Modified: Tuesday, 14th June 2022, 12:54:54 pm
+# Last Modified: Tuesday, 2nd August 2022, 1:20:27 pm
 #  
 # Copyright (c) 2022, Bruno R. de Abreu, National Center for Supercomputing Applications.
 # All rights reserved.
@@ -22,42 +22,44 @@
 #          author or copyright holders be liable for any kind of claim in connection to
 #          the software and its usage.
 ###
-import sys
-sys.path.insert(0, '../')
-from MapReduce import MapReduce
+from time import perf_counter
+from mapreduce import MapReduce
 
-def generate_random_text(seed):
+def generate_random_text(nwords, seed):
     """
     Creates a dummy text from tastes according to a fixed probability distribution.
 
     Inputs:
+        nwords (int): Number of words to be generated.
         seed (int): The seed for the random number generator.
 
     Returns:
-        A dictionary of words and their occurrences without performing the sum.
+        A list with the words
     """
     import numpy as np 
     np.random.seed(seed)
     tastes = ["bitter", "sweet", "sour", "salty", "umami"]
     probs = [0.1, 0.1, 0.1, 0.3, 0.4]
     text = []
-    for i in range(100):
+    for _ in range(nwords):
         taste = np.random.choice(tastes, p=probs)
-        text.append((taste, 1))
+        text.append(taste)
 
     return text
 
-def count_words(text_dict):
+def count_words(entry):
     """
-    Given a dictionary from generate_random_text, combine the occurrences of each word in it and return a dictionary of words and their counts.
+    Combine the occurrences of each word in a dictionary and return a dictionary of words and their counts.
     
     Inputs:
-        text_dict (dict): A dictionary with words as keys and their occurrences as values.
+        entry (dict): A dictionary item with words as keys and their occurrences as values.
+                            The key is the word and the value is a list with occurences.
+                            Example: {word1: [1,1,1,1]}
 
     Returns:
-        A dictionary of words and their final counts.
+        A tuple with the word and the final count of occurrences.
     """
-    word, occurrences = text_dict
+    word, occurrences = entry
     return (word, sum(occurrences))
 
 
@@ -66,11 +68,35 @@ if __name__ == "__main__":
     Creates a list of seeds and builds a MapReduce object with the generate_random_text function as a mapper and the count_words function as a reducer.
     """
     import operator
+    from itertools import repeat, chain
+    from collections import Counter
+    import time
 
     seeds = [1,2,3,4]
-    mapper = MapReduce(generate_random_text, count_words, num_workers=4)
-    word_counts = mapper(seeds)
+    nwords = 100000
+
+    # serial implementation
+    print("---- Serial implementation:")
+    start = time.perf_counter()
+    totalText = []
+    for seed in seeds:
+        text = generate_random_text(nwords, seed)
+        totalText.append(text)
+    counts = dict(Counter(chain(*totalText)))
+    counts = sorted(counts.items(), key=operator.itemgetter(1), reverse=True)
+    for word, count in counts:
+        print(f"{word}: {count} ({count / (nwords*len(seeds))} %)")
+    stop = time.perf_counter()
+    print(f"Execution time (s): {stop-start}\n\n")
+
+    # parallel implementation
+    print("---- Parallel implementation")
+    start = time.perf_counter()
+    mapArguments = list(zip(repeat(nwords), seeds))
+    mapper = MapReduce(generate_random_text, count_words, num_workers=len(seeds))
+    word_counts = mapper(mapArguments)
     word_counts = sorted(word_counts, key=operator.itemgetter(1), reverse=True)
     for word, count in word_counts:
-        print(f"{word}: {count}")
-
+        print(f"{word}: {count} ({count / (nwords*len(seeds))} %)")
+    stop = time.perf_counter()
+    print(f"Execution time (s): {stop-start}")

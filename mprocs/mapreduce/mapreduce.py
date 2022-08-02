@@ -5,7 +5,7 @@
 # National Center for Supercomputing Applications (NCSA)
 #  
 # Creation Date: Tuesday, 14th June 2022, 8:15:28 am
-# Last Modified: Tuesday, 14th June 2022, 8:16:27 am
+# Last Modified: Tuesday, 2nd August 2022, 1:21:02 pm
 #  
 # Copyright (c) 2022, Bruno R. de Abreu, National Center for Supercomputing Applications.
 # All rights reserved.
@@ -49,11 +49,11 @@ class MapReduce(object):
     def partition(self, mapped_values):
         """
         Organize mapped values by key.
-        Returns unsorted sequence of tuples with a key and a list of values.
+        Returns dictionary with a key and a list of values occurrences.
         """
         partitioned_data = collections.defaultdict(list)
-        for key, value in mapped_values:
-            partitioned_data[key].append(value)
+        for key in mapped_values:
+            partitioned_data[key].append(1)
         return partitioned_data.items()
 
     def __call__(self, inputs, chunksize=1):
@@ -66,7 +66,8 @@ class MapReduce(object):
         chunksize
             Portion of the input data to be handed to each worker.
         """
-        map_responses = self.pool.map(self.map_func, inputs, chunksize=chunksize)
+        map_responses = self.pool.starmap(self.map_func, inputs, chunksize=chunksize)
         partitioned_data = self.partition(itertools.chain(*map_responses))
         reduced_values = self.pool.map(self.reduce_func, partitioned_data)
+
         return reduced_values
