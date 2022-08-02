@@ -1,11 +1,11 @@
 ###
-# File: dispatchProcess.py
-# Description: Sample code to dispatch async processes using multiprocessing.
+# File: distributions.py
+# Description: Common probability distributions from NumPy
 # Author: Bruno R. de Abreu  |  babreu at illinois dot edu
 # National Center for Supercomputing Applications (NCSA)
 #  
-# Creation Date: Wednesday, 15th June 2022, 10:17:34 am
-# Last Modified: Wednesday, 15th June 2022, 10:48:30 am
+# Creation Date: Tuesday, 2nd August 2022, 10:02:54 am
+# Last Modified: Tuesday, 2nd August 2022, 10:03:35 am
 #  
 # Copyright (c) 2022, Bruno R. de Abreu, National Center for Supercomputing Applications.
 # All rights reserved.
@@ -49,35 +49,3 @@ def sampleGammaDistribution(nSamples):
     x = np.random.gamma(1.0, 1.0, nSamples)
     print(f"Gamma distribution: avg={x.mean()}, std={x.std()}")
     return
-
-
-
-if __name__ == "__main__":
-    import multiprocessing as mp
-    import time
-
-    nSamples = 100000000
-
-    # Serial version
-    print("Serial version:")
-    start = time.perf_counter()
-    sampleUniformDistribution(nSamples)
-    sampleGaussianDistribution(nSamples)
-    sampleGammaDistribution(nSamples)
-    end = time.perf_counter()
-    print(f"Execution time: {end - start}")
-
-    # Parallel version
-    print("\nParallel version:")
-    pUnif = mp.Process(target=sampleUniformDistribution, args=(nSamples,))
-    pGaus = mp.Process(target=sampleGaussianDistribution, args=(nSamples,))
-    pGamm = mp.Process(target=sampleGammaDistribution, args=(nSamples,))
-    start = time.perf_counter()
-    pUnif.start()
-    pGaus.start()
-    pGamm.start()
-    pUnif.join()
-    pGaus.join()
-    pGamm.join()
-    end = time.perf_counter()
-    print(f"Execution time: {end - start}")
