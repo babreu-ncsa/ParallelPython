@@ -5,7 +5,7 @@
 # National Center for Supercomputing Applications (NCSA)
 #  
 # Creation Date: Wednesday, 15th June 2022, 10:17:34 am
-# Last Modified: Tuesday, 2nd August 2022, 10:08:53 am
+# Last Modified: Tuesday, 2nd August 2022, 10:42:53 am
 #  
 # Copyright (c) 2022, Bruno R. de Abreu, National Center for Supercomputing Applications.
 # All rights reserved.
@@ -23,32 +23,33 @@
 #          the software and its usage.
 ###
 
-from mprocs.dispatchprocess import distributions as dists
+import distributions as dists
 import multiprocessing as mp
 import time
 
-nSamples = 100000000
+if __name__ == "__main__":
+    nSamples = 100000000
 
-# Serial version
-print("Serial version:")
-start = time.perf_counter()
-dists.sampleUniformDistribution(nSamples)
-dists.sampleGaussianDistribution(nSamples)
-dists.sampleGammaDistribution(nSamples)
-end = time.perf_counter()
-print(f"Execution time: {end - start}")
+    # Serial version
+    print("Serial version:")
+    start = time.perf_counter()
+    dists.sampleUniformDistribution(nSamples)
+    dists.sampleGaussianDistribution(nSamples)
+    dists.sampleGammaDistribution(nSamples)
+    end = time.perf_counter()
+    print(f"Execution time: {end - start}")
 
-# Parallel version
-print("\nParallel version:")
-pUnif = mp.Process(target=dists.sampleUniformDistribution, args=(nSamples,))
-pGaus = mp.Process(target=dists.sampleGaussianDistribution, args=(nSamples,))
-pGamm = mp.Process(target=dists.sampleGammaDistribution, args=(nSamples,))
-start = time.perf_counter()
-pUnif.start()
-pGaus.start()
-pGamm.start()
-pUnif.join()
-pGaus.join()
-pGamm.join()
-end = time.perf_counter()
-print(f"Execution time: {end - start}")
+    # Parallel version
+    print("\nParallel version:")
+    pUnif = mp.Process(target=dists.sampleUniformDistribution, args=(nSamples,))
+    pGaus = mp.Process(target=dists.sampleGaussianDistribution, args=(nSamples,))
+    pGamm = mp.Process(target=dists.sampleGammaDistribution, args=(nSamples,))
+    start = time.perf_counter()
+    pUnif.start()
+    pGaus.start()
+    pGamm.start()
+    pUnif.join()
+    pGaus.join()
+    pGamm.join()
+    end = time.perf_counter()
+    print(f"Execution time: {end - start}")
