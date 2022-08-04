@@ -5,7 +5,7 @@
 # National Center for Supercomputing Applications (NCSA)
 #  
 # Creation Date: Tuesday, 2nd August 2022, 1:57:55 pm
-# Last Modified: Wednesday, 3rd August 2022, 12:29:16 pm
+# Last Modified: Thursday, 4th August 2022, 12:30:10 pm
 #  
 # Copyright (c) 2022, Bruno R. de Abreu, National Center for Supercomputing Applications.
 # All rights reserved.
@@ -23,7 +23,7 @@
 #          the software and its usage.
 ###
 
-from multiprocessing import Process, Queue, freeze_support
+from multiprocessing import Process, freeze_support, Manager
 import time
 import auxiliaries as aux
 import functions
@@ -36,12 +36,12 @@ if __name__ == '__main__':
     nprocs = 3
 
     # define the tasks
-    #tasks = [(functions.mul, (i, 3)) for i in range(1000)]
-    tasks = [(functions.get_stats_from_uniform_dist, (2**23, i)) for i in range(500)]
+    tasks = [(functions.get_stats_from_uniform_dist, (2**25, i)) for i in range(50)]
 
-    # start the queues
-    task_queue = Queue()
-    result_queue = Queue()
+    # use a manager context to share queues between processes
+    manager = Manager()
+    task_queue = manager.Queue()
+    result_queue = manager.Queue()
 
     # populate task queue
     for task in tasks:
@@ -51,19 +51,20 @@ if __name__ == '__main__':
     for _ in range(nprocs):
         task_queue.put('STOP')
 
+    # start processes (workers)
     procs = []
     for _ in range(nprocs):
         p = Process(target=aux.worker, args=(task_queue, result_queue))
         p.start()
         procs.append(p)
 
+    # wait until workers are done
     for p in procs:
         p.join()
 
     # print what's in the result queue
     while not result_queue.empty():
         print(result_queue.get())
+        
     stop = time.perf_counter()
     print(f"Execution time (s): {stop-start}")
-   #task_queue.close()
-   #result_queue.close()

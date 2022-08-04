@@ -1,11 +1,11 @@
 ###
-# File: auxiliaries.py
-# Description: Auxiliaries for queueing.py
+# File: manager.py
+# Description: 
 # Author: Bruno R. de Abreu  |  babreu at illinois dot edu
 # National Center for Supercomputing Applications (NCSA)
 #  
-# Creation Date: Wednesday, 3rd August 2022, 9:38:42 am
-# Last Modified: Thursday, 4th August 2022, 10:00:42 am
+# Creation Date: Wednesday, 3rd August 2022, 1:31:48 pm
+# Last Modified: Wednesday, 3rd August 2022, 2:49:46 pm
 #  
 # Copyright (c) 2022, Bruno R. de Abreu, National Center for Supercomputing Applications.
 # All rights reserved.
@@ -22,32 +22,30 @@
 #          author or copyright holders be liable for any kind of claim in connection to
 #          the software and its usage.
 ###
-from multiprocessing import current_process
 
-def calculate(func, args):
-    """
-    Calculates a certain function for a list of arguments. Returns a string with the result.
+from multiprocessing import Manager, Process, current_process
+import random
+import time
 
-    Arguments:
-        - func (string): function name
-        - args (list): list of arguments
-    """
-    result = func(*args)
-    string = current_process().name
-    string = string + " says " + func.__name__ + str(args)
-    string = string + " = " + str(result)
-    return string
+def print_list(l, shuffle, lock):
+    if(shuffle):
+        lock.acquire()
+        random.shuffle(l)
+        lock.release()
+    return
 
 
-def worker(inputQueue, outputQueue):
-    """
-    Picks up work from the inputQueue and outputs result to outputQueue.
+if __name__ == "__main__":
+    manager = Manager()
+    lock = manager.RLock()
+    l = manager.list([i*i for i in range(10)])
+    print(l, sum(l))
+    print(repr(l))
 
-    Inputs:
-        - inputQueue (multiprocessing.Queue)
-        - outputQueue (multiprocessing.Queue)
-    """
-    for func, args in iter(inputQueue.get, 'STOP'):
-        result = calculate(func, args)
-        outputQueue.put(result)
+    p1 = Process(target=print_list, args=(l,True, lock))
+    p2 = Process(target=print_list, args=(l,True, lock))
+    p1.start()
+    p2.start()
+    p1.join()
+    p2.join()
 
