@@ -5,7 +5,7 @@
 # National Center for Supercomputing Applications (NCSA)
 #  
 # Creation Date: Wednesday, 3rd August 2022, 9:46:49 am
-# Last Modified: Wednesday, 3rd August 2022, 12:26:02 pm
+# Last Modified: Thursday, 4th August 2022, 1:39:21 pm
 #  
 # Copyright (c) 2022, Bruno R. de Abreu, National Center for Supercomputing Applications.
 # All rights reserved.
@@ -39,6 +39,3 @@ def get_stats_from_uniform_dist(nDraws, seed):
     np.random.seed(seed)
     x = np.random.rand(nDraws)
     return [x.mean(), x.std()]
-
-def mul(a,b):
-    return a*b
